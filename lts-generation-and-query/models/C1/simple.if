@@ -1,0 +1,137 @@
+system simple;
+
+type int = range 0 .. 255;
+
+const sO = 0;
+const sP1 = 15;
+const sP2 = 15;
+const sE1 = 2;
+const sE2 = 2;
+
+const cE1 = 5;
+const cE2 = 5;
+
+const aO = 0;
+const aP1 = 5;
+const aP2 = 5;
+const aE1 = 2;
+const aE2 = 2;
+
+signal sData();
+signal cData();
+
+process Sensor(1);
+    var x clock;
+    
+    state startS #start ;
+        set x := 0;
+        nextstate first;
+    endstate;
+
+    state first ;
+        when x = sO;
+            informal "SENSOR_START";
+            set x := 0;
+            nextstate exec;
+    endstate;
+
+    state exec;
+        deadline delayable;
+        when x >= sE1 and x <= sE2;
+            informal "SENSOR_FINISH";
+            output sData() to {Control}0;
+            nextstate wait;
+    endstate;
+
+    state wait;
+        deadline delayable;
+        when x >= sP1 and x <= sP2;
+            informal "SENSOR_START";
+            set x := 0;
+            nextstate exec;
+    endstate;
+
+endprocess;
+
+
+process Control(1);
+    var x clock;
+
+    state wait #start ;
+        input sData();
+            informal "CONTROLLER_START";
+            set x := 0;
+            nextstate processing;
+    endstate;
+
+    state processing;
+        deadline delayable;
+        when x >= cE1 and x <= cE2;
+            informal "CONTROLLER_FINISH";
+            output cData() to {Actuator}0;
+            reset x;
+            nextstate wait;
+    endstate;
+endprocess;
+
+process Actuator(1);
+    var x clock;
+    var nbData int;
+    var nbUselessExec int;
+
+    state startA #start ;
+        task nbData := 0;
+        task nbUselessExec := 0;
+        set x := 0;
+        nextstate first;
+    endstate;
+
+    state first ;
+        when x = aO;
+            set x := 0;
+            nextstate preprocessing;
+        
+        input cData();
+            task nbData := nbData + 1;
+            nextstate first;
+    endstate;
+
+    state wait;
+        deadline delayable;
+        when x >= aP1 and x <= aP2;
+            set x := 0;
+            nextstate preprocessing;
+        
+        input cData();
+            task nbData := nbData + 1;
+            nextstate wait;
+    endstate;
+
+    state preprocessing;
+        deadline eager;
+        provided nbData =  0;
+            informal "USELESS_ACTUATION";
+            task nbUselessExec := nbUselessExec + 1;
+            nextstate processing;
+        deadline eager;
+        provided nbData <>  0;
+            informal "USEFUL_ACTUATION";
+            task nbUselessExec := 0;
+            task nbData := 0;
+            nextstate processing;
+    endstate;
+
+    state processing;
+        deadline delayable;
+        when x >= aE1 and x <= aE2;
+            informal "ACTUATOR_FINISH";
+            nextstate wait;
+        
+        input cData();
+            task nbData := nbData + 1;
+            nextstate processing;
+    endstate;
+
+endprocess;
+
+endsystem;

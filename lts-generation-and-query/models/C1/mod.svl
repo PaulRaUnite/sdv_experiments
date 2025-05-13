@@ -1,0 +1,31 @@
+
+% modelname='simple'
+% modelfinal="simple-final"
+% modelhidden="simple-hidden"
+% hidden="USELESS_ACTUATION,USEFUL_ACTUATION"
+% tohide="<<{Sensor}0 i>> ,<<{Actuator}0 i>>,<<{Control}0 i>>,<<{time}0 t/1>>,<<{time}0 t/2>>,<<{time}0 t/3>>,<<{time}0 t/4>>,<<{time}0 t/5>>,<<{time}0 t/6>>,<<{time}0 t/7>>,<<{time}0 t/8>>,<<{time}0 t/9>>,<<{time}0 t/10>>,<<{Actuator}0 ?cData{}{Actuator}0>>"
+"simple-final.bcg" = total hide {$tohide} in "simple.bcg";
+
+"simple-final.bcg" = total rename "<<{Actuator}0 i>> <<{Actuator}0 ACTUATOR_FINISH{Actuator}0>>" 
+-> "ACTUATOR_FINISH" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{Actuator}0 USELESS_ACTUATION{Actuator}0>>" 
+-> "USELESS_ACTUATION" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{Actuator}0 USEFUL_ACTUATION{Actuator}0>>" 
+-> "USEFUL_ACTUATION" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{Sensor}0 i>> <<{Sensor}0 SENSOR_START{Sensor}0>>" 
+-> "SENSOR_START" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{Sensor}0 i>> <<{Sensor}0 SENSOR_FINISH{Sensor}0>> <<{Sensor}0 !sData{}{Control}0>>"
+-> "SENSOR_FINISH" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{Control}0 ?sData{}{Control}0>> <<{Control}0 CONTROLLER_START{Control}0>>" 
+-> "CONTROLLER_START" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{Control}0 i>> <<{Control}0 CONTROLLER_FINISH{Control}0>> <<{Control}0 !cData{}{Actuator}0>>"
+-> "CONTROLLER_FINISH" in "simple-final.bcg";
+
+"simple-final.bcg" = weak trace reduction of "simple-final.bcg";
+"simple-final.bcg" = strong reduction of "simple-final.bcg";
+"simple-final.aut" = generation of "simple-final.bcg";
+
+"simple-hidden.bcg" = total hide all but {$hidden} in "simple-final.bcg";
+"simple-hidden.bcg" = weak trace reduction of "simple-hidden.bcg";
+"simple-hidden.bcg" = strong reduction of "simple-hidden.bcg";
+"simple-hidden.aut" = generation of "simple-hidden.bcg";

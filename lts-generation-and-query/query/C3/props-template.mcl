@@ -1,0 +1,7 @@
+[true* . "CONTROLLER_START" ]
+prob
+    ((not ("USELESS_ACTUATION" or "CONTROLLER_FINISH"))* . "USELESS_ACTUATION") {number-of-n} .
+    ((not ("USELESS_ACTUATION" or "CONTROLLER_FINISH"))* . "CONTROLLER_FINISH")
+is
+    >= ? 0
+end prob
