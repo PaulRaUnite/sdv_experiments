@@ -6,10 +6,19 @@ In order to run the full experiments, the following software must be installed:
 - Python (https://www.python.org/)
 
 The models directory contains timed automata expressed using the IF language.
-To generate the LTS of a model, users can run the build.sh script.
+To generate the LTS of a model, users can run the build.sh script inside each configuration directory:
+```
+./build.sh
+```
+The command will result in files named simple-final.aut and simple-final.bcg.
+The .aut file represents the LTS file textually, whereas .bcg file can be used to visually analyse the LTS using a command in CADP:
+```
+simple-final.bcg
+```
 
 The query directory contains probabilistic temporal logic querying using CADP.
-To perform the querying, users can run the query.sh script.
-
-The graph directory contains the visualization of the query results.
-To show the graph, users can run the python code graphall.py.
+To perform the querying, users can run the query.sh script:
+```
+./query.sh
+```
+The script returns a text file named verdicts.txt, which can be visualised using a python script in the graph directory.
