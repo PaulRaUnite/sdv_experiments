@@ -1,5 +1,8 @@
 import itertools
 import random
+from functools import wraps
+from typing import TextIO, Optional
+
 import simpy
 import scipy
 from simpy import Event
@@ -26,28 +29,124 @@ def random_float(left, right) -> float:
         return random.uniform(left, right)
 
 
-class TaskNoResource:
-    def __init__(self, env, execTime, execJitter):
-        self.env = env
-        self.exec_range = (execTime - execJitter, execTime + execJitter)
+class Dist:
+    def sample(self) -> float:
+        pass
 
-    def execute(self):
-        yield self.env.timeout(random_float(*self.exec_range))
+
+class NormalDist(Dist):
+    def __init__(self, mean: float, deviation: float, bounds: tuple[float, float] | None):
+        (lower, upper) = bounds
+        assert lower > 0
+        assert lower < upper
+        self.mean = mean
+        self.deviation = deviation
+        self.bounds = bounds
+        self.dist = scipy.stats.truncnorm(
+            (lower - mean) / deviation, (upper - mean) / deviation, loc=mean, scale=deviation)
+
+    @staticmethod
+    def from_95_interval(left, right):
+        mean = (right - left) / 2 + left
+        deviation = (right - left) / 4  # 95%
+        return NormalDist(mean, deviation, (left, right))
+
+    @staticmethod
+    def from_99_interval(left, right):
+        mean = (right - left) / 2 + left
+        deviation = (right - left) / 6  # 99.7%
+        return NormalDist(mean, deviation, (left, right))
+
+    def sample(self) -> float:
+        return self.dist.rvs()
+
+
+class UniformDist(Dist):
+    def __init__(self, lower, upper):
+        assert lower > 0
+        assert lower < upper
+        self.lower = lower
+        self.upper = upper
+
+    def sample(self) -> float:
+        return random.uniform(self.lower, self.lower)
+
+class NamedEvent(Event):
+    def __init__(self, env: simpy.Environment, category: str, *namespace: str):
+        super().__init__(env)
+        self.category = category
+        self.namespaces = namespace
+
+
+class TaskNoResource:
+    def __init__(self, env, name, exec_time: Dist):
+        self.env = env
+        self.exec_time = exec_time
+        self.name = name
+
+    def execute(self, instance: int):
+        yield self.env.timeout(self.exec_time.sample())
 
 
 class TaskWithResource:
-    def __init__(self, env, cpu, execTime, execJitter):
+    def __init__(self, env, cpu: simpy.Resource, name, exec_time: Dist):
         self.env = env
         self.cpu = cpu
-        self.exec_range = (execTime - execJitter, execTime + execJitter)
+        self.name = name
+        self.exec_time = exec_time
 
-    def execute(self):
+    def execute(self, instance: int):
         with self.cpu.request() as request:
             yield request
-            yield self.env.timeout(random_float(*self.exec_range))
+            yield env.event()
+            yield self.env.timeout(self.exec_time.sample())
 
 
-def schedule_sensor(env, arrTrace, name, sen, con, conTaskCount):
+
+class Monitor:
+    def monitor(self, timestamp, event: Event):
+        pass
+
+class CADPMonitor:
+    def __init__(self, file: TextIO):
+        self.file = file
+
+    def monitor(self, timestamp, event: NamedEvent):
+        prefix = "_".join(event.namespaces)
+        self.file.write(f"{prefix}_{event.category},".upper())
+
+
+class MRTCCSLMonitor:
+    def __init__(self, file: TextIO):
+        self.file = file
+
+    def monitor(self, timestamp, event: NamedEvent):
+        prefix = ".".join(x[0] for x in event.namespaces)
+        self.file.write(f"{prefix}.{event.category[0]} {timestamp}\n")
+
+
+def env_monitor(env: simpy.Environment, monitor: Monitor) -> simpy.Environment:
+    @wraps(env.step)
+    def wrapper():
+        if len(env._queue):
+            t, prio, eid, event = env._queue[0]
+            if isinstance(event, NamedEvent):
+                monitor.monitor(t, event)
+        return env.step()
+
+    env.step = wrapper
+    return env
+
+def periodic_scheduler(env: simpy.Environment, offset: Dist, period: Dist, process_factory):
+    count = 0
+    yield env.timeout(offset.sample())
+    while True:
+        env.process(process_factory(count))
+        count += 1
+        yield env.timeout(period.sample())
+
+
+def schedule_sensor(env, arrTrace, sen, con):
     # print(f"Sensor's {name} starts executing at {env.now:.2f}.")
     arrTrace.append(("s.s", "SENSOR_START", env.now))
     yield env.process(sen.execute())
@@ -100,10 +199,11 @@ def actuatorPeriodic(env, arrTrace, exec_time, exec_jitter, period, period_jitte
 
 if __name__ == '__main__':
     configurations = [
-        ("c1", 2, 0, 15, 0, 5, 0, 2, 1, 5, 0),
+        # ("c1", 2, 0, 15, 0, 5, 0, 2, 1, 5, 0),
         ("c2", 2, 1, 15, 1, 5, 3, 2, 1, 5, 1),
-        ("c3", 2, 1, 15, 1, 5, 3, 2, 1, 15, 1),
-        ("c4", 2, 1, 5, 1, 5, 3, 2, 1, 15, 1),
+        # ("c3", 2, 1, 15, 1, 5, 3, 2, 1, 15, 1),
+        # ("c4", 2, 1, 5, 1, 5, 3, 2, 1, 15, 1),
+        # ("c5", 2, 1, 15, 1, 3, 1, 2, 1, 5, 1),
     ]
     for (
             conf_name,
@@ -117,8 +217,8 @@ if __name__ == '__main__':
             A1_EXEC_JITTER,
             A1_PERIODIC_TIME,
             A1_PERIODIC_JITTER) in configurations:
-        for normal in [True, False]:
-            for res in [2, 16]:
+        for normal in [True]:
+            for res in [16]:
                 dist = "normal" if NORMAL else "uniform"
                 print(f"started {conf_name}_{dist}_{res}cores.txt")
 
@@ -129,12 +229,12 @@ if __name__ == '__main__':
                 cpu = simpy.Resource(env, res)
                 arrTrace = []
                 env.process(
+                    actuatorPeriodic(env, arrTrace, A1_EXEC_TIME, A1_EXEC_JITTER, A1_PERIODIC_TIME, A1_PERIODIC_JITTER))
+                env.process(
                     sensorPeriodic(env, cpu, arrTrace, S1_EXEC_TIME, S1_EXEC_JITTER, S1_PERIODIC_TIME,
                                    S1_PERIODIC_JITTER,
                                    C1_EXEC_TIME,
                                    C1_EXEC_JITTER))
-                env.process(
-                    actuatorPeriodic(env, arrTrace, A1_EXEC_TIME, A1_EXEC_JITTER, A1_PERIODIC_TIME, A1_PERIODIC_JITTER))
                 env.run(until=SIM_TIME)
 
                 with open(f"{conf_name}_{dist}_{res}cores.txt", "w") as output1, open(
