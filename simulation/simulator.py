@@ -1,6 +1,7 @@
 import itertools
 import random
 import simpy
+import os
 import scipy
 from simpy import Event
 
@@ -137,8 +138,9 @@ if __name__ == '__main__':
                     actuatorPeriodic(env, arrTrace, A1_EXEC_TIME, A1_EXEC_JITTER, A1_PERIODIC_TIME, A1_PERIODIC_JITTER))
                 env.run(until=SIM_TIME)
 
-                with open(f"{conf_name}_{dist}_{res}cores.txt", "w") as output1, open(
-                        f"{conf_name}_{dist}_{res}cores.cadp.txt", "w") as output2:
+                os.makedirs(f"./data/{conf_name}/{dist}/{res}cores/", exist_ok=True)
+                with open(f"./data/{conf_name}/{dist}/{res}cores/trace.txt", "w") as output1, open(
+                        f"./data/{conf_name}/{dist}/{res}cores/trace.cadp.txt", "w") as output2:
                     delim = ""
                     for mrtccsl_action, cadp_action, t in arrTrace:
                         delim = ","
@@ -157,5 +159,5 @@ if __name__ == '__main__':
                         "\nA1_EXEC_JITTER = " + str(A1_EXEC_JITTER) +
                         "\nA1_PERIODIC_TIME = " + str(A1_PERIODIC_TIME) +
                         "\nA1_PERIODIC_JITTER = " + str(A1_PERIODIC_JITTER))
-                with open(f"{conf_name}_{dist}_{res}cores-info.txt", "w") as file:
+                with open(f"./data/{conf_name}/{dist}/{res}cores/info.txt", "w") as file:
                     file.write(info)
