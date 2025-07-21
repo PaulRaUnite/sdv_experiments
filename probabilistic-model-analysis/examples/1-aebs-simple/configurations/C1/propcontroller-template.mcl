@@ -1,0 +1,7 @@
+[true* . "C_START" ]
+prob
+    (((not ("USELESS_ACT" or "C_FINISH" or "C_START"))* . "USELESS_ACT") {number-of-n}) .
+    ((not ("USELESS_ACT" or "C_FINISH" or "C_START"))* . "C_FINISH")
+is
+    >= ? 0
+end prob

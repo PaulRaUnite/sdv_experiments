@@ -1,0 +1,7 @@
+[true* . "Brake_USEFUL_ACTUATION" ]
+prob
+    (((not ("Brake_USELESS_ACTUATION" or "Brake_USEFUL_ACTUATION"))* . "Brake_USELESS_ACTUATION") {number-of-n}) .
+    ((not ("Brake_USELESS_ACTUATION" or "Brake_USEFUL_ACTUATION"))* . "Brake_USEFUL_ACTUATION")
+is
+    >= ? 0
+end prob
