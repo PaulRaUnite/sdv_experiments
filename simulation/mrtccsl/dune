@@ -1,0 +1,13 @@
+(executable
+ (public_name full)
+ (name full)
+ (modules full)
+ (libraries mrtccsl mrtccsl.std domainslib mrtccsl.halsoa))
+
+(executable
+ (public_name simple)
+ (name simple)
+ (modules simple)
+ (libraries mrtccsl mrtccsl.std domainslib mrtccsl.halsoa)
+ (preprocess
+  (pps ppx_deriving.map)))
