@@ -1,0 +1,50 @@
+
+% modelname='simple'
+% modelfinal="simple-final"
+% tohidezero="<<{Sensor}0 i>>,<<{Controller}0 i>>,<<{Actuator}0 i>>"
+% tohidedata=$tohidezero",<<{Controller}0 ?sensorData{}{Controller}0>>,<<{Actuator}0 ?controllerData{}{Actuator}0>>"
+"simple-final.bcg" = total hide {$tohidedata} in "simple.bcg";
+
+"simple-final.bcg" = total rename "<<{time}0 t/1>>" 
+-> "Time_1" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{time}0 t/2>>" 
+-> "Time_2" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{time}0 t/3>>" 
+-> "Time_3" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{time}0 t/4>>" 
+-> "Time_4" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{time}0 t/5>>" 
+-> "Time_5" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{time}0 t/6>>" 
+-> "Time_6" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{time}0 t/7>>" 
+-> "Time_7" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{time}0 t/8>>" 
+-> "Time_8" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{time}0 t/9>>" 
+-> "Time_9" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{time}0 t/10>>" 
+-> "Time_10" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{time}0 t/11>>" 
+-> "Time_11" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{time}0 t/12>>" 
+-> "Time_12" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{Sensor}0 i>> <<{Sensor}0 S_START{Sensor}0>>" 
+-> "S_START" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{Sensor}0 i>> <<{Sensor}0 S_FINISH{Sensor}0>> <<{Sensor}0 !sensorData{}{Controller}0>>" 
+-> "S_FINISH" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{Controller}0 ?sensorData{}{Controller}0>> <<{Controller}0 C_START{Controller}0>>" 
+-> "C_START" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{Controller}0 i>> <<{Controller}0 C_FINISH{Controller}0>> <<{Controller}0 !controllerData{}{Actuator}0>>" 
+-> "C_FINISH" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{Actuator}0 USELESS_ACT{Actuator}0>>" 
+-> "USELESS_ACT" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{Actuator}0 USEFUL_ACT{Actuator}0>>" 
+-> "USEFUL_ACT" in "simple-final.bcg";
+"simple-final.bcg" = total rename "<<{Actuator}0 i>> <<{Actuator}0 A_FINISH{Actuator}0>>" 
+-> "A_FINISH" in "simple-final.bcg";
+
+"simple-final.bcg" = weak trace reduction of "simple-final.bcg";
+"simple-final.bcg" = strong reduction of "simple-final.bcg";
+"simple-final.aut" = generation of "simple-final.bcg";
+

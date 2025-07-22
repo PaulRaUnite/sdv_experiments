@@ -1,0 +1,72 @@
+
+% modelname='aebs'
+% modelfinal="aebs-final"
+% tohidezero="<<{Camera}0 i>>,<<{Lidar}0 i>>,<<{Radar}0 i>>,<<{Fusion}0 i>>,<<{Controller}0 i>>,<<{Alarm}0 i>>,<<{Brake}0 i>>"
+% tohidedata=$tohidezero",<<{Fusion}0 ?cameraData{}{Fusion}0>>,<<{Fusion}0 ?lidarData{}{Fusion}0>>,<<{Fusion}0 ?radarData{}{Fusion}0>>,<<{Brake}0 ?controllerData{}{Brake}0>>"
+"aebs-final.bcg" = total hide {$tohidedata} in "aebs.bcg";
+
+"aebs-final.bcg" = total rename "<<{time}0 t/1>>" 
+-> "Time_1" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{time}0 t/2>>" 
+-> "Time_2" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{time}0 t/3>>" 
+-> "Time_3" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{time}0 t/4>>" 
+-> "Time_4" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{time}0 t/5>>" 
+-> "Time_5" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{time}0 t/6>>" 
+-> "Time_6" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{time}0 t/7>>" 
+-> "Time_7" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{time}0 t/8>>" 
+-> "Time_8" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{time}0 t/9>>" 
+-> "Time_9" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{time}0 t/10>>" 
+-> "Time_10" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{time}0 t/11>>" 
+-> "Time_11" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{time}0 t/12>>" 
+-> "Time_12" in "aebs-final.bcg";
+
+"aebs-final.bcg" = total rename "<<{Alarm}0 ?controllerData{}{Alarm}0>> <<{Alarm}0 Alarm_START{Alarm}0>>" 
+-> "Alarm_START" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{Alarm}0 i>> <<{Alarm}0 Alarm_FINISH{Alarm}0>>" 
+-> "Alarm_FINISH" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{Brake}0 i>> <<{Brake}0 Brake_FINISH{Brake}0>>" 
+-> "Brake_FINISH" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{Brake}0 Brake_USELESS_ACTUATION{Brake}0>>" 
+-> "Brake_USELESS_ACTUATION" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{Brake}0 Brake_USEFUL_ACTUATION{Brake}0>>" 
+-> "Brake_USEFUL_ACTUATION" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{Camera}0 i>> <<{Camera}0 Camera_START{Camera}0>>" 
+-> "Camera_START" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{Camera}0 i>> <<{Camera}0 Camera_FINISH{Camera}0>> <<{Camera}0 !cameraData{}{Fusion}0>>"
+-> "Camera_FINISH" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{Lidar}0 i>> <<{Lidar}0 Lidar_START{Lidar}0>>" 
+-> "Lidar_START" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{Lidar}0 i>> <<{Lidar}0 Lidar_FINISH{Lidar}0>> <<{Lidar}0 !lidarData{}{Fusion}0>>"
+-> "Lidar_FINISH" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{Radar}0 i>> <<{Radar}0 Radar_START{Radar}0>>" 
+-> "Radar_START" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{Radar}0 i>> <<{Radar}0 Radar_FINISH{Radar}0>> <<{Radar}0 !radarData{}{Fusion}0>>"
+-> "Radar_FINISH" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{Controller}0 ?fusionData{}{Controller}0>> <<{Controller}0 Controller_START{Controller}0>>"
+-> "Controller_START" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{Controller}0 i>> <<{Controller}0 Controller_FINISH{Controller}0>> <<{Controller}0 !controllerData{}{Alarm}0>> <<{Controller}0 !controllerData{}{Brake}0>>"
+-> "Controller_FINISH" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{Fusion}0 i>> <<{Fusion}0 Fusion_FINISH{Fusion}0>>" 
+-> "Fusion_FINISH" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{Fusion}0 i>> <<{Fusion}0 Fusion_FINISH{Fusion}0>> <<{Fusion}0 !fusionData{}{Controller}0>>"
+-> "Fusion_FINISH" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{Fusion}0 Fusion_USEFUL_PROCESS{Fusion}0>>" 
+-> "Fusion_USEFUL_PROCESS" in "aebs-final.bcg";
+"aebs-final.bcg" = total rename "<<{Fusion}0 Fusion_USELESS_PROCESS{Fusion}0>>" 
+-> "Fusion_USELESS_PROCESS" in "aebs-final.bcg";
+
+
+"aebs-final.bcg" = weak trace reduction of "aebs-final.bcg";
+"aebs-final.bcg" = strong reduction of "aebs-final.bcg";
+"aebs-final.aut" = generation of "aebs-final.bcg";
+
