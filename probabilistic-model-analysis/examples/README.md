@@ -8,7 +8,7 @@ Each example takes the following files as input:
 
 The script `run.sh` can be executed to run the following steps:
 1. compile the IF model `simple.if` into an LTS `simple.aut`
-2. simplify the LTS's labels, which results in a new LTS `simple-final.aut`
+2. simplify the LTS's labels and apply minimization algorithms, which results in a new LTS `simple-final.aut`
 3. run the python simulator, which generates a set of traces inside `trace` directory in each configuration
 4. compute the PTS using `ptsv.jar` to produce `simple-final-pts.aut`
 5. apply the probabilistic querying on the PTS, which results in probabilities in a .txt file (e.g., `1-aebs-simple/configurations/C1/controller.txt`)
