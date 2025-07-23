@@ -20,7 +20,7 @@ To install the library with the simulation and reaction time computation executa
 ```bash
 opam switch create ./ ocaml-variants.5.3.0+options ocaml-option-flambda
 eval $(opam env)
-opam pin git+https://github.com/PaulRaUnite/mrtccsl#70b300ed934a98a11169fb0634818925b81ccca3
+opam pin git+https://github.com/PaulRaUnite/mrtccsl#2b9ce40489c3ccf330121e39e2f26a2687e3d295
 opam install mrtccsl
 ```
 During the installation, `opam` should prompt the user to install missing system libraries through their package manager (it is at least the case with [GMP](https://gmplib.org/) library).
@@ -58,7 +58,7 @@ Then the process is as follows:
 - generate traces and reaction time distributions:
     - either by using MRTCCSL and `simple`/`full` executables:
     ```bash 
-    dune exec simple --release -- -c 4 -t 10 -s 100000 -h 100000 -bob -cadp ./data_mrtccsl/full/
+    dune exec simple --release -- -c 4 -t 10 -s 100000 -h 100000 -bob -cadp ./data_mrtccsl/simple/
     ./visualize-reaction.sh ./data_mrtccsl/
     ```
     Replace simple with full to simulate the 7 component AEBS.
@@ -70,4 +70,4 @@ Then the process is as follows:
     ```
     - the resulting plots in PDF, trace vizualization (only MRTCCSL) and reaction times are then can be found next in the data directories.
 
-After this, `*.cadp.txt` traces can be used as input for the analysis described in [./probabilistic-model-analysis/README.md](./probabilistic-model-analysis/README.md).
+After this, `*.cadp.txt` traces can be used as input for the analysis described in [./lts-generation-and-query/README.md](./lts-generation-and-query/README.md).
